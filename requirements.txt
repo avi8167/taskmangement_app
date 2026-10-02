@@ -1,0 +1,25 @@
+fastapi[standard]
+sqlalchemy
+psycopg2-binary
+pydantic-settings
+python-dotenv
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Database migrations
+alembic
+
+# HTTP requests / external APIs
+httpx
+
+# File upload
+python-multipart
+
+# AI / GenAI
+openai
+
+# Data processing
+pandas
+numpy

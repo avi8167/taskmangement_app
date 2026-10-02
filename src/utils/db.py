@@ -1,0 +1,27 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker,declarative_base
+
+from src.utils.settings import settings
+
+base = declarative_base()
+engine = create_engine(url = settings.DB_CONNECTION)
+Localsession  = sessionmaker(bind=engine)
+
+def get_db():
+    session = Localsession()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+# API Request
+#      ↓
+# Create session
+#      ↓
+# Use PostgreSQL
+#      ↓
+# Error OR Success
+#      ↓
+# session.close()
+
