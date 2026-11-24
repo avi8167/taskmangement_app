@@ -1,48 +1,45 @@
-
 from src.tasks.dtos import TaskSchema
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import session
+
 from src.tasks.models import TaskModel
+
 from fastapi import HTTPException
 
-def create_task(body:TaskSchema,db:Session):
+def create_task(body:TaskSchema,db:session):
 
     data = body.model_dump()
 
-    new_task = TaskModel(title= data["title"],
-                         description = data["description"],
-                         is_completed = data["is_completed"]
-                         )
+    new_task = TaskModel(
+        title = data["title"],
+        derscription = data["description"],
+        is_completed = data["is_completed"]
+    )
     db.add(new_task)
     db.commit()
-    db.refresh(new_task)
+    db.refresh()
+    return{"Status":"Task ceated successfully", "Data":new_task}
 
-    return {"status":"Task created Successfully","Data":new_task}
 
-def get_task(db:Session):
+
+def get_all_tasks(db:session):
     task = db.query(TaskModel).all()
-    return{"status":"All Tasks","Data":task}
+    return {"Status":"All task", "Data":task}
 
-
-def get_one_task(task_id:int, db:Session):
-
+def get_one_tasks(task_id:int,db:session):
     one_task = db.query(TaskModel).get(task_id)
 
     if not one_task:
-        return HTTPException(404, detail="Task id is Incorrect")
+        return HTTPException(404,detail="Task id is incorrect")
+
+    return {"Status":"Task Fatched successfully", "Data":one_task}
 
 
-    return {"status":"Tasked fatched successfully","data":one_task}
 
+def update_task(task_id:int,db:session):
+    one_task = db.query(TaskSchema).get(task_id)
 
-def update_task(body:TaskSchema,task_id:int,db:Session):
-    one_task = db.query(TaskModel).get(task_id)
-    
     if not one_task:
-        return HTTPException(404, detail="Task id is Incorrect")
-
-    # one_task.title = body.title
-    # one_task.description = body.description
-    # one_task.is_completed = body.is_completed
+        return HTTPException(404,detail="Task id is incorrect")
 
     body = body.model_dump()
     for field,value in body.items():
@@ -51,20 +48,37 @@ def update_task(body:TaskSchema,task_id:int,db:Session):
     db.add(one_task)
     db.commit()
     db.refresh(one_task)
+
     return{
-        "status":"Update Successfully","data":one_task
+        "Status":"Update task successfully",
+        "Data":one_task
     }
 
-def delete_task(task_id:int,db:Session):
-    one_task = db.query(TaskModel).get(task_id)
-        
+
+
+def delete_task(task_id:int,db:session):
+    one_task = db.query(TaskSchema).get(task_id)
+
     if not one_task:
-        return HTTPException(404, detail="Task id is Incorrect")
-    
+        return HTTPException(404,detail="Task id is incorrect")
+
     db.delete(one_task)
     db.commit()
 
-    return {"status":"Task deleted successfully","data":one_task}
+    return {
+        "Status":"Task deleted successfully",
+        "Data":one_task
+    }
 
 
-    
+
+def delete_all_task(db:session):
+    tasks = db.query(TaskModel).all()
+
+    for task in tasks:
+        db.delete(task)
+
+    db.commit()
+    return{
+         "Status":"All Task deleted successfully",
+    }
